@@ -1,0 +1,50 @@
+@startuml
+skinparam BoxPadding 10
+skinparam ParticipantPadding 10
+skinparam shadowing false
+
+actor "Користувач" as User
+box "Frontend (Клієнт)" #LightBlue
+  participant "React UI Form" as UI
+  participant "API Client" as API
+end box
+
+box "Backend (Сервер)" #LightGreen
+  participant "Express Router / Middleware" as Route
+  participant "Subscription Controller" as Ctrl
+  participant "Subscription Service" as Service
+  participant "Sequelize Model" as ORM
+end box
+
+database "PostgreSQL" as DB
+
+User -> UI : Заповнює форму та клікає "Зберегти"
+activate UI
+UI -> API : createSubscription(subData)
+activate API
+API -> Route : POST /api/subscriptions (Headers: Auth Bearer <token>)
+activate Route
+Route -> Route : Перевірка JWT токена & вилучення userId
+Route -> Ctrl : createSubscription(req, res)
+deactivate Route
+activate Ctrl
+Ctrl -> Service : createSubscription(userId, subData)
+activate Service
+Service -> ORM : Subscription.create({userId, ...subData})
+activate ORM
+ORM -> DB : INSERT INTO subscriptions (...) VALUES (...)
+activate DB
+DB --> ORM : Повертає створений запис (з UUID)
+deactivate DB
+ORM --> Service : Об'єкт моделі Subscription
+deactivate ORM
+Service --> Ctrl : Об'єкт Subscription
+deactivate Service
+Ctrl --> API : HTTP 201 Created (JSON з даними підписки)
+deactivate Ctrl
+API --> UI : JSON результат
+deactivate API
+UI -> UI : Оновлення стану (state update) та рендеринг списку
+UI --> User : Повідомлення про успішне додавання
+deactivate UI
+@enduml

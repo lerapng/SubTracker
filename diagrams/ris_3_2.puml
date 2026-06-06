@@ -1,0 +1,34 @@
+@startuml
+skinparam PackageStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
+
+package "Клієнтська частина (Frontend - React SPA)" {
+  [Presentation Layer\n(React Components, Recharts, Pages, Tailwind CSS)] as FrontPres
+}
+
+package "Серверна частина (Backend - Node.js / Express)" {
+  package "API / Routing Layer" {
+    [Express Router] as Router
+    [Auth Middleware (JWT)] as Middleware
+  }
+  
+  package "Business Logic Layer" {
+    [Controllers] as Controllers
+    [Services (Бізнес-логіка)] as Services
+  }
+  
+  package "Data Access Layer (DAL)" {
+    [Sequelize ORM Models] as Models
+  }
+}
+
+database "PostgreSQL (БД)" as DB
+
+FrontPres --> Router : HTTP Requests (JSON / REST)
+Router --> Middleware : Перевірка авторизації
+Middleware --> Controllers : Передача керування
+Controllers --> Services : Виклик бізнес-операцій
+Services --> Models : Робота з сутностями
+Models --> DB : SQL-запити (через PG драйвер)
+@enduml

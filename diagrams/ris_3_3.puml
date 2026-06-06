@@ -1,0 +1,73 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam linetype ortho
+
+class User {
+  + id: UUID
+  + username: string
+  + email: string
+  + passwordHash: string
+  + createdAt: DateTime
+  + updatedAt: DateTime
+  + register(): boolean
+  + login(): string
+}
+
+class Subscription {
+  + id: UUID
+  + userId: UUID
+  + categoryId: UUID
+  + name: string
+  + description: string
+  + price: decimal
+  + currency: string
+  + paymentCycle: string
+  + nextPaymentDate: Date
+  + website: string
+  + isArchived: boolean
+  + createdAt: DateTime
+  + updatedAt: DateTime
+  + archive(): void
+  + calculateNextPaymentDate(): Date
+}
+
+class Category {
+  + id: UUID
+  + name: string
+  + iconName: string
+  + color: string
+  + createdAt: DateTime
+  + updatedAt: DateTime
+}
+
+class UserController {
+  - userService: UserService
+  + register(req, res): void
+  + login(req, res): void
+  + getProfile(req, res): void
+}
+
+class SubscriptionController {
+  - subscriptionService: SubscriptionService
+  + create(req, res): void
+  + getAll(req, res): void
+  + update(req, res): void
+  + delete(req, res): void
+  + archive(req, res): void
+  + getSummary(req, res): void
+}
+
+class CategoryController {
+  - categoryService: CategoryService
+  + getAll(req, res): void
+  + create(req, res): void
+}
+
+User "1" *-- "0..*" Subscription : володіє
+Category "1" *-- "0..*" Subscription : групує
+
+UserController ..> User : використовує
+SubscriptionController ..> Subscription : використовує
+CategoryController ..> Category : використовує
+@enduml

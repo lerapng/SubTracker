@@ -1,0 +1,46 @@
+@startuml
+!theme plain
+hide circle
+skinparam linetype ortho
+skinparam shadowing false
+
+entity "users" {
+  * id : UUID [PK]
+  --
+  * username : VARCHAR(100)
+  * email : VARCHAR(150) [UQ]
+  * password_hash : VARCHAR(255)
+  * created_at : TIMESTAMP WITH TIME ZONE
+  * updated_at : TIMESTAMP WITH TIME ZONE
+}
+
+entity "categories" {
+  * id : UUID [PK]
+  --
+  * name : VARCHAR(50) [UQ]
+  * icon_name : VARCHAR(50)
+  * color : VARCHAR(7)
+  * created_at : TIMESTAMP WITH TIME ZONE
+  * updated_at : TIMESTAMP WITH TIME ZONE
+}
+
+entity "subscriptions" {
+  * id : UUID [PK]
+  --
+  * user_id : UUID [FK -> users.id]
+  * category_id : UUID [FK -> categories.id]
+  * name : VARCHAR(100)
+  description : TEXT
+  * price : NUMERIC(10, 2)
+  * currency : VARCHAR(3)
+  * payment_cycle : VARCHAR(20)
+  * next_payment_date : DATE
+  website : VARCHAR(255)
+  * is_archived : BOOLEAN
+  * created_at : TIMESTAMP WITH TIME ZONE
+  * updated_at : TIMESTAMP WITH TIME ZONE
+}
+
+users ||--o{ subscriptions : "user_id (1:N)"
+categories ||--o{ subscriptions : "category_id (1:N)"
+@enduml
