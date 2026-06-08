@@ -109,12 +109,32 @@ export default function SubscriptionForm({
     if (!form.name.trim()) return setError("Вкажіть назву підписки.");
     setSaving(true);
     try {
+      // Мапа для конвертації текстового BillingCycle у число для C# Enum
+      const billingCycleMap: Record<string, number> = {
+        Monthly: 0,
+        Yearly: 1,
+        Weekly: 2,
+        Quarterly: 3,
+      };
+
+      // Мапа для конвертації текстового SubscriptionStatus у число для C# Enum
+      const statusMap: Record<string, number> = {
+        Active: 0,
+        Paused: 1,
+        Cancelled: 2,
+      };
+
+      // Формуємо правильний payload, замінюючи рядки на числа
       const payload = {
         ...form,
         website: form.website?.trim() || null,
+        billingCycle: billingCycleMap[form.billingCycle] ?? 0,
+        status: statusMap[form.status] ?? 0,
       };
+
       if (id) await api.update(id, payload);
       else await api.create(payload);
+      
       router.push("/subscriptions");
       router.refresh();
     } catch (e) {
